@@ -1,3 +1,14 @@
 server:
   port: 8081
 
+spring:
+  r2dbc:
+    url: 'r2dbc:postgresql://postgres@localhost:5445/carpark'
+    password: 'postgres'
+
+one-map-sg:
+  url: 'https://www.onemap.gov.sg/api/common/convert/3414to4326'
+  token: ${ONEMAP_SG_TOKEN}
+
+sg-park:
+  url: 'https://api.data.gov.sg/v1/transport/carpark-availability'
