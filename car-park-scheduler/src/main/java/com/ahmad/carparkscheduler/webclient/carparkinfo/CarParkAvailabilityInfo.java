@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.webclient;
+package com.ahmad.carparkscheduler.webclient.carparkinfo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,13 +1,11 @@
-package com.ahmad.carparkscheduler.persister;
-
-import static org.junit.jupiter.api.Assertions.*;
+package com.ahmad.carparkscheduler.csv;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CarParkServiceTest {
+class CarParkCSVServiceTest {
 
   @Test
   void readCarParkInfoFile() {

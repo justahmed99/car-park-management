@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.csv.carparkinfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class CarParkInfo {
+public class CarParkInfoCSV {
   private final String carParkNo;
   private final String address;
-  private final String xCoord;
-  private final String yCoord;
+  private final Double xCoord;
+  private final Double yCoord;
   private final String carParkType;
   private final String typeOfParkingSystem;
   private final String shortTermPark;

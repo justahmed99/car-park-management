@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.webclient;
+package com.ahmad.carparkscheduler.webclient.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

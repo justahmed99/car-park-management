@@ -1,11 +1,12 @@
-package com.ahmad.carparkscheduler.webclient;
+package com.ahmad.carparkscheduler.webclient.carparkinfo;
 
+import com.ahmad.carparkscheduler.webclient.dto.CarParkAvailabilityDTO;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CarParkAvailabilityConverter {
 
-  static List<CarParkAvailabilityInfo> fromDTO(
+  public static List<CarParkAvailabilityInfo> fromDTO(
       final CarParkAvailabilityDTO carParkAvailabilityDTO) {
     List<CarParkAvailabilityInfo> data = new ArrayList<>();
     carParkAvailabilityDTO.getItems().forEach(item -> {

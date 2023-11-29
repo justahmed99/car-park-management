@@ -1,14 +1,14 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.csv.carparkinfo;
 
 import org.apache.commons.csv.CSVRecord;
 
-public class CarParkConverter {
-  public static CarParkInfo convertStringLineToCarParkInfo(final CSVRecord record) {
-    return CarParkInfo.builder()
+public class CarParkCSVConverter {
+  public static CarParkInfoCSV convertStringLineToCarParkInfo(final CSVRecord record) {
+    return CarParkInfoCSV.builder()
         .carParkNo(record.get(0))
         .address(record.get(1))
-        .xCoord(record.get(2))
-        .yCoord(record.get(3))
+        .xCoord(Double.parseDouble(record.get(2)))
+        .yCoord(Double.parseDouble(record.get(3)))
         .carParkType(record.get(4))
         .typeOfParkingSystem(record.get(5))
         .shortTermPark(record.get(6))
