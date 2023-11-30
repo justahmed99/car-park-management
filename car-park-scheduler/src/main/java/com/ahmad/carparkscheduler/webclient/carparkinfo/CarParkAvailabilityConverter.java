@@ -16,7 +16,7 @@ public class CarParkAvailabilityConverter {
         CarParkAvailabilityInfo info = new CarParkAvailabilityInfo();
         info.setCarParkNo(carParkDataDTO.getCarParkNumber());
         info.setAvailableLots(carParkDataDTO.getCarParkInfo().stream()
-            .mapToInt(value -> Integer.parseInt(value.getTotalLots())).sum());
+            .mapToInt(value -> Integer.parseInt(value.getLotsAvailable())).sum());
         data.put(carParkDataDTO.getCarParkNumber(), info);
       });
     });

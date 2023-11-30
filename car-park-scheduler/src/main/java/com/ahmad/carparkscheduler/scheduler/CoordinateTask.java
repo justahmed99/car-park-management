@@ -2,11 +2,13 @@ package com.ahmad.carparkscheduler.scheduler;
 
 import com.ahmad.carparkscheduler.csv.CarParkCSVService;
 import com.ahmad.carparkscheduler.csv.carparkinfo.CarParkInfoCSV;
-import com.ahmad.carparkscheduler.persister.CarParkInfo;
-import com.ahmad.carparkscheduler.persister.CarParkInfoConverter;
-import com.ahmad.carparkscheduler.persister.CarParkInfoEntity;
-import com.ahmad.carparkscheduler.persister.CarParkInfoPersister;
-import com.ahmad.carparkscheduler.persister.CarParkInfoRetriever;
+import com.ahmad.carparkscheduler.persister.postgre.CarParkInfo;
+import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoConverter;
+import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoEntity;
+import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoPersister;
+import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoRetriever;
+import com.ahmad.carparkscheduler.persister.redis.CarParkGeoDataConverter;
+import com.ahmad.carparkscheduler.persister.redis.CarParkGeoDataService;
 import com.ahmad.carparkscheduler.webclient.CarParkAvailabilityService;
 import com.ahmad.carparkscheduler.webclient.carparkinfo.CarParkAvailabilityInfo;
 import com.ahmad.carparkscheduler.webclient.coordinate.SVY21Coordinate;
@@ -27,6 +29,7 @@ public class CoordinateTask {
   private final CarParkInfoRetriever carParkInfoRetriever;
   private final CarParkCSVService carParkCSVService;
   private final CarParkAvailabilityService carParkAvailabilityService;
+  private final CarParkGeoDataService carParkGeoDataService;
 
   // @Scheduled(cron = "0 * * * * ?")
   public void test() {
@@ -41,22 +44,27 @@ public class CoordinateTask {
     carParkAvailability.subscribe(carParkAvailabilityInfos -> {
       Flux<CarParkInfo> carParkInfoFlux = carParkInfoRetriever.findAllCarParkInfo()
           .flatMap(carParkInfo -> {
-            CarParkAvailabilityInfo selectedInfo = carParkAvailabilityInfos.get(carParkInfo.getCarParkNo());
-            if (selectedInfo.getAvailableLots() != null)
+            CarParkAvailabilityInfo selectedInfo = carParkAvailabilityInfos.get(
+                carParkInfo.getCarParkNo());
+            if (selectedInfo != null) {
               carParkInfo.setLotsAvailable(selectedInfo.getAvailableLots());
+            }
             return Mono.just(carParkInfo);
-          });
+          }).filter(carParkInfo -> carParkInfo.getLotsAvailable() != null);
+      carParkGeoDataService.deleteLocation("coordinates").subscribe(aLong -> {
+        carParkInfoFlux.subscribe(carParkInfo -> {
+          carParkGeoDataService.addLocation("coordinates",
+                  CarParkGeoDataConverter.fromScheduler(carParkInfo))
+              .subscribe();
+          // System.out.println(carParkInfo.getCarParkNo() + " | (" + carParkInfo.getLatitude() + " , "
+          //     + carParkInfo.getLongitude() + ") | " + carParkInfo.getLotsAvailable());
 
-      carParkInfoFlux.subscribe(carParkInfo -> {
-        System.out.print("car park no : " + carParkInfo.getCarParkNo());
-        System.out.print(" car park latitude : " + carParkInfo.getLatitude());
-        System.out.print(" car park longitude : " + carParkInfo.getLongitude());
-        System.out.print(" car park availability : " + carParkInfo.getLotsAvailable());
+        });
       });
     });
   }
 
-  @Scheduled(cron = "0 */2 * * * ?")
+  @Scheduled(cron = "0 0/2 * * * ?")
   public void populateCarParkInfo() {
     System.out.println("Populate car park info | " + java.time.LocalDateTime.now());
     final List<CarParkInfoCSV> carParkInfoCSVList = carParkCSVService.readCarParkInfoFile();

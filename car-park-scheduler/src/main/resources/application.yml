@@ -5,6 +5,11 @@ spring:
   r2dbc:
     url: 'r2dbc:postgresql://postgres@localhost:5445/carpark'
     password: 'postgres'
+  data:
+    redis:
+      host: 'localhost'
+      port: 6379
+
 
 one-map-sg:
   url: 'https://www.onemap.gov.sg/api/common/convert/3414to4326'
