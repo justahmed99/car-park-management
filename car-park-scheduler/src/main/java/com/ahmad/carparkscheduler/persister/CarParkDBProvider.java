@@ -20,4 +20,10 @@ public class CarParkDBProvider implements CarParkInfoPersister, CarParkInfoRetri
   public Mono<Long> count() {
     return carParkInfoRepository.count();
   }
+
+  @Override
+  public Flux<CarParkInfo> findAllCarParkInfo() {
+    return carParkInfoRepository.findAll()
+        .map(CarParkInfoConverter::fromEntity);
+  }
 }

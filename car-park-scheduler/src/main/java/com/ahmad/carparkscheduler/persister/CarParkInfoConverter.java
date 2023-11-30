@@ -13,4 +13,13 @@ public class CarParkInfoConverter {
         .y(carParkInfoCSV.getYCoord())
         .build());
   }
+
+  public static CarParkInfo fromEntity(final CarParkInfoEntity carParkInfoEntity) {
+    return CarParkInfo.builder()
+        .carParkNo(carParkInfoEntity.getCarParkNo())
+        .address(carParkInfoEntity.getAddress())
+        .latitude(carParkInfoEntity.getLatitude())
+        .longitude(carParkInfoEntity.getLongitude())
+        .build();
+  }
 }

@@ -2,14 +2,17 @@ package com.ahmad.carparkscheduler.scheduler;
 
 import com.ahmad.carparkscheduler.csv.CarParkCSVService;
 import com.ahmad.carparkscheduler.csv.carparkinfo.CarParkInfoCSV;
+import com.ahmad.carparkscheduler.persister.CarParkInfo;
 import com.ahmad.carparkscheduler.persister.CarParkInfoConverter;
 import com.ahmad.carparkscheduler.persister.CarParkInfoEntity;
 import com.ahmad.carparkscheduler.persister.CarParkInfoPersister;
 import com.ahmad.carparkscheduler.persister.CarParkInfoRetriever;
 import com.ahmad.carparkscheduler.webclient.CarParkAvailabilityService;
+import com.ahmad.carparkscheduler.webclient.carparkinfo.CarParkAvailabilityInfo;
 import com.ahmad.carparkscheduler.webclient.coordinate.SVY21Coordinate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -32,7 +35,25 @@ public class CoordinateTask {
 
   @Scheduled(cron = "0 0/15 * * * ?")
   public void populateLots() {
-    System.out.println("Populate car park lots | " + java.time.LocalDateTime.now() );
+    System.out.println("Populate car park lots | " + java.time.LocalDateTime.now());
+    final Mono<Map<String, CarParkAvailabilityInfo>> carParkAvailability = carParkAvailabilityService
+        .getCarParkAvailabilityInfo();
+    carParkAvailability.subscribe(carParkAvailabilityInfos -> {
+      Flux<CarParkInfo> carParkInfoFlux = carParkInfoRetriever.findAllCarParkInfo()
+          .flatMap(carParkInfo -> {
+            CarParkAvailabilityInfo selectedInfo = carParkAvailabilityInfos.get(carParkInfo.getCarParkNo());
+            if (selectedInfo.getAvailableLots() != null)
+              carParkInfo.setLotsAvailable(selectedInfo.getAvailableLots());
+            return Mono.just(carParkInfo);
+          });
+
+      carParkInfoFlux.subscribe(carParkInfo -> {
+        System.out.print("car park no : " + carParkInfo.getCarParkNo());
+        System.out.print(" car park latitude : " + carParkInfo.getLatitude());
+        System.out.print(" car park longitude : " + carParkInfo.getLongitude());
+        System.out.print(" car park availability : " + carParkInfo.getLotsAvailable());
+      });
+    });
   }
 
   @Scheduled(cron = "0 */2 * * * ?")

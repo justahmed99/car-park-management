@@ -6,6 +6,7 @@ import com.ahmad.carparkscheduler.webclient.coordinate.SVY21Coordinate;
 import com.ahmad.carparkscheduler.webclient.coordinate.WGS84Coordinate;
 import com.ahmad.carparkscheduler.webclient.dto.CarParkAvailabilityDTO;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,7 +25,7 @@ public class CarParkAvailabilityService {
   @Value("${one-map-sg.token}")
   private String oneMapSgToken;
 
-  public Flux<List<CarParkAvailabilityInfo>> getCarParkAvailabilityInfo() {
+  public Mono<Map<String, CarParkAvailabilityInfo>> getCarParkAvailabilityInfo() {
     final WebClient webClient = WebClient.builder()
         .baseUrl(sgParkUrl)
         .codecs(configurer -> configurer.defaultCodecs()
@@ -32,7 +33,7 @@ public class CarParkAvailabilityService {
         .build();
     return webClient.get()
         .retrieve()
-        .bodyToFlux(CarParkAvailabilityDTO.class)
+        .bodyToMono(CarParkAvailabilityDTO.class)
         .mapNotNull(CarParkAvailabilityConverter::fromDTO);
   }
 
