@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.persister.postgre;
 
 import com.ahmad.carparkscheduler.csv.carparkinfo.CarParkInfoCSV;
 import reactor.core.publisher.Mono;

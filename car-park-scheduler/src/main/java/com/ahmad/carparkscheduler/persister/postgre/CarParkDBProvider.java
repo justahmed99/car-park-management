@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.persister.postgre;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

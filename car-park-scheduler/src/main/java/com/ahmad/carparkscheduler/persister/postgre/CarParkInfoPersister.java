@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.persister.postgre;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

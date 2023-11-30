@@ -1,4 +1,4 @@
-package com.ahmad.carparkscheduler.persister;
+package com.ahmad.carparkscheduler.persister.postgre;
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
