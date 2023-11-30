@@ -1,2 +1,12 @@
 server:
   port: 8080
+
+coordinate:
+  collection-key: 'coordinates'
+  radius-in-km: 1.0
+
+spring:
+  data:
+    redis:
+      host: 'localhost'
+      port: 6379
