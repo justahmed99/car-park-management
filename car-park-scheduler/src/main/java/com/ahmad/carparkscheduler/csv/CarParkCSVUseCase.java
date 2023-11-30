@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CarParkCSVService {
+public class CarParkCSVUseCase {
 
   private final ResourceLoader resourceLoader;
 

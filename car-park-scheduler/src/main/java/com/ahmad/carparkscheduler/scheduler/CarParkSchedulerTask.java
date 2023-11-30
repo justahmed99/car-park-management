@@ -1,6 +1,6 @@
 package com.ahmad.carparkscheduler.scheduler;
 
-import com.ahmad.carparkscheduler.csv.CarParkCSVService;
+import com.ahmad.carparkscheduler.csv.CarParkCSVUseCase;
 import com.ahmad.carparkscheduler.csv.carparkinfo.CarParkInfoCSV;
 import com.ahmad.carparkscheduler.persister.postgre.CarParkInfo;
 import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoConverter;
@@ -8,8 +8,8 @@ import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoEntity;
 import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoPersister;
 import com.ahmad.carparkscheduler.persister.postgre.CarParkInfoRetriever;
 import com.ahmad.carparkscheduler.persister.redis.CarParkGeoDataConverter;
-import com.ahmad.carparkscheduler.persister.redis.CarParkGeoDataService;
-import com.ahmad.carparkscheduler.webclient.CarParkAvailabilityService;
+import com.ahmad.carparkscheduler.persister.redis.CarParkGeoDataProvider;
+import com.ahmad.carparkscheduler.webclient.CarParkAvailabilityUseCase;
 import com.ahmad.carparkscheduler.webclient.carparkinfo.CarParkAvailabilityInfo;
 import com.ahmad.carparkscheduler.webclient.coordinate.SVY21Coordinate;
 import java.util.ArrayList;
@@ -23,23 +23,18 @@ import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
-public class CoordinateTask {
+public class CarParkSchedulerTask {
 
   private final CarParkInfoPersister carParkInfoPersister;
   private final CarParkInfoRetriever carParkInfoRetriever;
-  private final CarParkCSVService carParkCSVService;
-  private final CarParkAvailabilityService carParkAvailabilityService;
-  private final CarParkGeoDataService carParkGeoDataService;
-
-  // @Scheduled(cron = "0 * * * * ?")
-  public void test() {
-    System.out.println("test scheduler");
-  }
+  private final CarParkCSVUseCase carParkCSVUseCase;
+  private final CarParkAvailabilityUseCase carParkAvailabilityUseCase;
+  private final CarParkGeoDataProvider carParkGeoDataProvider;
 
   @Scheduled(cron = "0 0/15 * * * ?")
   public void populateLots() {
     System.out.println("Populate car park lots | " + java.time.LocalDateTime.now());
-    final Mono<Map<String, CarParkAvailabilityInfo>> carParkAvailability = carParkAvailabilityService
+    final Mono<Map<String, CarParkAvailabilityInfo>> carParkAvailability = carParkAvailabilityUseCase
         .getCarParkAvailabilityInfo();
     carParkAvailability.subscribe(carParkAvailabilityInfos -> {
       Flux<CarParkInfo> carParkInfoFlux = carParkInfoRetriever.findAllCarParkInfo()
@@ -51,9 +46,9 @@ public class CoordinateTask {
             }
             return Mono.just(carParkInfo);
           }).filter(carParkInfo -> carParkInfo.getLotsAvailable() != null);
-      carParkGeoDataService.deleteLocation("coordinates").subscribe(aLong -> {
+      carParkGeoDataProvider.deleteLocation().subscribe(aLong -> {
         carParkInfoFlux.subscribe(carParkInfo -> {
-          carParkGeoDataService.addLocation("coordinates",
+          carParkGeoDataProvider.addLocation(
                   CarParkGeoDataConverter.fromScheduler(carParkInfo))
               .subscribe();
           // System.out.println(carParkInfo.getCarParkNo() + " | (" + carParkInfo.getLatitude() + " , "
@@ -67,7 +62,7 @@ public class CoordinateTask {
   @Scheduled(cron = "0 0/2 * * * ?")
   public void populateCarParkInfo() {
     System.out.println("Populate car park info | " + java.time.LocalDateTime.now());
-    final List<CarParkInfoCSV> carParkInfoCSVList = carParkCSVService.readCarParkInfoFile();
+    final List<CarParkInfoCSV> carParkInfoCSVList = carParkCSVUseCase.readCarParkInfoFile();
     System.out.println("CSV Size : " + carParkInfoCSVList.size());
     List<CarParkInfoCSV> selectedCarParkInfoCSVList = new ArrayList<>();
     Mono<Long> countDB = carParkInfoRetriever.count();
@@ -90,7 +85,7 @@ public class CoordinateTask {
         Flux<CarParkInfoEntity> infoEntityFlux = Flux.fromIterable(selectedCarParkInfoCSVList)
             .flatMap(CarParkInfoConverter::fromCSVToEntity)
             .flatMap(carParkInfoEntity -> {
-              return carParkAvailabilityService.getWgs84Coordinate(
+              return carParkAvailabilityUseCase.getWgs84Coordinate(
                   SVY21Coordinate.builder()
                       .x(carParkInfoEntity.getX())
                       .y(carParkInfoEntity.getY())

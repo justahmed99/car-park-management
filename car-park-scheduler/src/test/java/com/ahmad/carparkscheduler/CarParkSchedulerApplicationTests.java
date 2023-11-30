@@ -4,25 +4,23 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import com.ahmad.carparkscheduler.csv.carparkinfo.CarParkInfoCSV;
-import com.ahmad.carparkscheduler.csv.CarParkCSVService;
+import com.ahmad.carparkscheduler.csv.CarParkCSVUseCase;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import reactor.test.StepVerifier;
 
 @SpringBootTest
 class CarParkSchedulerApplicationTests {
 
   @InjectMocks
-  private CarParkCSVService carParkCSVService;
+  private CarParkCSVUseCase carParkCSVUseCase;
 
   @Mock
   private ResourceLoader resourceLoader;
@@ -56,7 +54,7 @@ class CarParkSchedulerApplicationTests {
         resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 
-    assertThat(carParkCSVService.readCarParkInfoFile()).isEqualTo(expectedCarParkInfoCSV);
+    assertThat(carParkCSVUseCase.readCarParkInfoFile()).isEqualTo(expectedCarParkInfoCSV);
   }
 
   @Test
@@ -71,6 +69,6 @@ class CarParkSchedulerApplicationTests {
         resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 
-    assertThat(carParkCSVService.getFileLength()).isEqualTo(4);
+    assertThat(carParkCSVUseCase.getFileLength()).isEqualTo(4);
   }
 }

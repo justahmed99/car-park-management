@@ -4,17 +4,15 @@ import com.ahmad.carparkscheduler.webclient.carparkinfo.CarParkAvailabilityConve
 import com.ahmad.carparkscheduler.webclient.carparkinfo.CarParkAvailabilityInfo;
 import com.ahmad.carparkscheduler.webclient.coordinate.SVY21Coordinate;
 import com.ahmad.carparkscheduler.webclient.coordinate.WGS84Coordinate;
-import com.ahmad.carparkscheduler.webclient.dto.CarParkAvailabilityDTO;
-import java.util.List;
+import com.ahmad.carparkscheduler.webclient.availability.CarParkAvailabilityDTO;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CarParkAvailabilityService {
+public class CarParkAvailabilityUseCase {
 
   @Value("${sg-park.url}")
   private String sgParkUrl;

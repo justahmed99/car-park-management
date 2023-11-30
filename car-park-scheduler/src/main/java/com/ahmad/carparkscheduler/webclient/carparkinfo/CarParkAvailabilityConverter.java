@@ -1,9 +1,7 @@
 package com.ahmad.carparkscheduler.webclient.carparkinfo;
 
-import com.ahmad.carparkscheduler.webclient.dto.CarParkAvailabilityDTO;
-import java.util.ArrayList;
+import com.ahmad.carparkscheduler.webclient.availability.CarParkAvailabilityDTO;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CarParkAvailabilityConverter {

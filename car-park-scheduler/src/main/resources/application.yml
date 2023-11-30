@@ -17,3 +17,7 @@ one-map-sg:
 
 sg-park:
   url: 'https://api.data.gov.sg/v1/transport/carpark-availability'
+
+coordinate:
+  collection-key: 'coordinates'
+  radius-in-km: 1.0

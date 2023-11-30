@@ -1,6 +1,7 @@
 package com.ahmad.carparkscheduler.persister.redis;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.Metrics;
@@ -11,29 +12,30 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class CarParkGeoDataService {
+public class CarParkGeoDataProvider implements CarParkGeoDataPersister {
 
   private final ReactiveRedisTemplate<String, CarParkGeoData> redisTemplate;
 
-  public CarParkGeoDataService(
+  @Value("${coordinate.radius-in-km}")
+  private Double radius;
+
+  @Value("${coordinate.collection-key}")
+  private String collectionKey;
+
+  public CarParkGeoDataProvider(
       @Qualifier("reactiveRedisTemplateConfig") ReactiveRedisTemplate<String, CarParkGeoData> redisTemplate) {
     this.redisTemplate = redisTemplate;
   }
 
-  public Mono<Boolean> addLocation(String key, CarParkGeoData carParkGeoData) {
-    return redisTemplate.opsForGeo().add(key, new Point(carParkGeoData.getLongitude(),
+  @Override
+  public Mono<Boolean> addLocation(CarParkGeoData carParkGeoData) {
+    return redisTemplate.opsForGeo().add(collectionKey, new Point(carParkGeoData.getLongitude(),
             carParkGeoData.getLatitude()), carParkGeoData)
         .map(l -> l > 0);
   }
 
-  public Flux<CarParkGeoData> findWithin(String key, double latitude, double longitude, double radius) {
-    Circle within = new Circle(new Point(longitude, latitude),
-        new Distance(radius, Metrics.KILOMETERS));
-    return redisTemplate.opsForGeo().radius(key, within)
-        .map(result -> result.getContent().getName());
-  }
-
-  public Mono<Long> deleteLocation(String key) {
-    return redisTemplate.delete(key);
+  @Override
+  public Mono<Long> deleteLocation() {
+    return redisTemplate.delete(collectionKey);
   }
 }
