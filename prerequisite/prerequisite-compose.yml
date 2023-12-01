@@ -1,0 +1,27 @@
+version: '2'
+services:
+  postgres-car-park:
+    image: postgres:12
+    ports:
+      - '5445:5432'
+    container_name: postgres-car-park
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: carpark
+    volumes:
+      - postgres-car-park:/var/lib/postgresql/data
+  
+  redis:
+    image: redis:latest
+    container_name: redis-car-park
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      
+volumes:
+  postgres-car-park:
+    driver: local
+  redis-data:
